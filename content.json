@@ -114,8 +114,9 @@ function start() {
 
   $('#app').innerHTML = `
     <div class="home-header">
-      <h2>Welcome${name ? `, ${name}` : ''} 👋</h2>
-      <p>${state.data.voice.tagline} ${state.data.voice.sub}</p>
+      <div class="home-header-eyebrow">Tribes Protecting Tribes</div>
+      <h2>${name ? `Welcome, ${name}.` : 'Keep Indian money in Indian Country.'}</h2>
+      <p>A safer home protects your family and strengthens your community. Complete each module to earn your Home Ready certificate.</p>
       <div class="overall-progress">
         <div class="progress-bar"><div class="fill" style="width:${overallPct}%"></div></div>
         <span>${state.badges.length}/4 badges</span>
@@ -123,12 +124,12 @@ function start() {
     </div>
 
     ${!name ? `<div class="card" style="margin-bottom:16px">
-      <p style="margin-bottom:12px;font-weight:500">Add your name to personalize your certificate:</p>
+      <p style="margin-bottom:12px;font-weight:500">Enter your name to personalize your certificate:</p>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <input id="nameInput" type="text" placeholder="First name" value=""
           style="padding:10px 14px;border:2px solid var(--border);border-radius:var(--radius-sm);font-size:.95rem;font-family:var(--font-body);color:var(--fg);background:var(--bg);outline:none;transition:border-color .15s;width:200px"
           onfocus="this.style.borderColor='var(--primary)'" onblur="this.style.borderColor='var(--border)'" />
-        <button class="btn btn-primary" id="saveName">Save Name</button>
+        <button class="btn btn-primary" id="saveName">Save</button>
         <button class="btn btn-ghost" id="skipName">Skip</button>
       </div>
     </div>` : ''}
@@ -155,7 +156,7 @@ function start() {
       <button class="btn btn-accent" id="downloadCert">Download Certificate</button>
     </div>` : ''}
 
-    <div class="community-tip"><strong>Community tip:</strong> ${randPick(state.data.voice.community_tips)}</div>
+    <div class="community-tip"><strong>Be here for as long as Tribes need us.</strong> ${randPick(state.data.voice.community_tips)}</div>
   `;
 
   $('#saveName')?.addEventListener('click', () => {

@@ -434,18 +434,28 @@
     /* ── CERTIFICATE / HOME ── */
     .home-header {
       margin-bottom: 20px;
-      padding: 24px;
+      padding: 28px 24px;
       background: linear-gradient(135deg, var(--primary), var(--primary-2));
       border-radius: var(--radius);
       color: #fff;
     }
+    .home-header-eyebrow {
+      font-family: var(--font-display);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      opacity: .7;
+      margin-bottom: 8px;
+    }
     .home-header h2 {
       font-family: var(--font-display);
-      font-size: 1.6rem;
+      font-size: 1.55rem;
       font-weight: 800;
-      margin-bottom: 4px;
+      margin-bottom: 8px;
+      line-height: 1.2;
     }
-    .home-header p { opacity: .85; font-size: .9rem; }
+    .home-header p { opacity: .82; font-size: .88rem; line-height: 1.5; margin-bottom: 4px; }
     .overall-progress {
       margin-top: 16px;
       display: flex; align-items: center; gap: 12px;
@@ -501,8 +511,8 @@
   <header>
     <div class="logo">🏠</div>
     <div>
-      <h1>Home Ready — AMERIND</h1>
-      <small>Tribes Protecting Tribes</small>
+      <h1>Home Ready</h1>
+      <small>An AMERIND Risk Control Program</small>
     </div>
     <div class="hc-toggle">
       <label for="contrastToggle" style="cursor:pointer">High contrast</label>
