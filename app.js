@@ -660,104 +660,169 @@ function downloadMaintenancePDF(m, plan) {
     'Exterior':'#2e7d32','Fire Safety':'#e65100','Appliances':'#5d4037',
     'Waterproofing':'#00838f','Energy':'#f57f17',
   };
+
   const name = state.player.name || 'Resident';
   const date = new Date().toLocaleDateString();
 
-  const c = document.createElement('canvas');
-  const W = 1100, H = 850;
-  c.width = W; c.height = H;
-  const ctx = c.getContext('2d');
+  // Layout constants — sized to fit 9 tasks + 12 months cleanly
+  const W = 1300, HEADER_H = 75, COL_HEADER_H = 28;
+  const TASK_COL = 280;   // task label column width
+  const COL_W = 78;        // each month column (78 × 12 = 936)
+  const ROW_H = 40;
+  const TOP = HEADER_H + COL_HEADER_H + 8;
+  const GRID_LEFT = TASK_COL + 8;
+  const H = TOP + m.tasks.length * ROW_H + 50;
 
-  // Background
-  ctx.fillStyle = '#f8fafa';
+  const c = document.createElement('canvas');
+  const DPR = 2; // render at 2x for crisp output regardless of screen density
+  c.width = W * DPR;
+  c.height = H * DPR;
+  c.style.width = W + 'px';
+  c.style.height = H + 'px';
+  const ctx = c.getContext('2d');
+  ctx.scale(DPR, DPR);
+
+  // ── Background ──
+  ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, W, H);
 
-  // Header band
+  // ── Header band ──
   ctx.fillStyle = '#0a4d4a';
-  ctx.fillRect(0, 0, W, 70);
+  ctx.fillRect(0, 0, W, HEADER_H);
   ctx.fillStyle = '#f0a500';
-  ctx.fillRect(0, 70, W, 5);
+  ctx.fillRect(0, HEADER_H, W, 4);
 
-  // Header text
-  ctx.fillStyle = '#fff';
-  ctx.font = 'bold 26px sans-serif';
-  ctx.fillText('Home Ready — Annual Maintenance Schedule', 30, 44);
-  ctx.font = '14px sans-serif';
-  ctx.fillStyle = 'rgba(255,255,255,.75)';
-  ctx.fillText(`${name}  •  Generated ${date}  •  AMERIND Risk Control`, 30, 62);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 22px sans-serif';
+  ctx.fillText('Home Ready — Annual Maintenance Schedule', 24, 34);
+  ctx.font = '13px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.72)';
+  ctx.fillText(`${name}  ·  ${date}  ·  AMERIND Risk Control`, 24, 58);
 
-  // Month column headers
-  const LEFT = 200, COL_W = 80, ROW_H = 36, TOP = 110;
+  // ── Month column headers ──
   ctx.font = 'bold 12px sans-serif';
-  ctx.fillStyle = '#0a4d4a';
   MONTHS.forEach((mon, i) => {
-    ctx.fillStyle = '#e2f0ef';
-    ctx.fillRect(LEFT + i * COL_W, TOP - 24, COL_W - 2, 22);
+    const x = GRID_LEFT + i * COL_W;
+    const y = HEADER_H + 4;
+    // Alternate column header shading
+    ctx.fillStyle = i % 2 === 0 ? '#e2f0ef' : '#f0f7f6';
+    ctx.fillRect(x, y, COL_W - 1, COL_HEADER_H);
+    // Centered month label
     ctx.fillStyle = '#0a4d4a';
-    ctx.fillText(mon, LEFT + i * COL_W + 22, TOP - 8);
+    ctx.textAlign = 'center';
+    ctx.fillText(mon, x + COL_W / 2, y + 18);
   });
+  ctx.textAlign = 'left';
 
-  // Grid lines
-  ctx.strokeStyle = '#d8e5e4';
-  ctx.lineWidth = 1;
-
-  // Rows
+  // ── Rows ──
   m.tasks.forEach((task, ri) => {
     const y = TOP + ri * ROW_H;
     const placed = plan[task.id] || [];
     const color = CAT_COLORS[task.category] || '#0a4d4a';
 
-    // Row bg alternating
-    ctx.fillStyle = ri % 2 === 0 ? '#fff' : '#f5f9f8';
+    // Row background
+    ctx.fillStyle = ri % 2 === 0 ? '#ffffff' : '#f7fafa';
     ctx.fillRect(0, y, W, ROW_H);
 
-    // Category dot + task label
+    // Left color bar
     ctx.fillStyle = color;
-    ctx.beginPath();
-    ctx.arc(14, y + ROW_H / 2, 5, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.fillRect(0, y, 4, ROW_H);
 
+    // Task label — truncated cleanly to fit TASK_COL
     ctx.fillStyle = '#0d1a19';
     ctx.font = '12px sans-serif';
-    ctx.fillText(task.label.length > 28 ? task.label.slice(0, 27) + '…' : task.label, 26, y + ROW_H / 2 + 4);
+    const maxChars = 36;
+    const label = task.label.length > maxChars ? task.label.slice(0, maxChars - 1) + '…' : task.label;
+    ctx.fillText(label, 14, y + ROW_H / 2 + 4);
 
-    ctx.fillStyle = color + '22';
-    const catW = 70;
-    ctx.fillRect(LEFT - catW - 4, y + 4, catW, ROW_H - 8);
-    ctx.fillStyle = color;
-    ctx.font = 'bold 9px sans-serif';
-    ctx.fillText(task.category.toUpperCase().slice(0,9), LEFT - catW, y + ROW_H / 2 + 3);
+    // Frequency tag (small, right-aligned in task col)
+    if (task.freq) {
+      const freqClean = task.freq.replace(' (Recommended)', '').replace('Every Load / Annual', 'Annual');
+      ctx.font = '9px sans-serif';
+      ctx.fillStyle = color;
+      const fw = ctx.measureText(freqClean).width;
+      ctx.fillText(freqClean, TASK_COL - fw - 6, y + ROW_H / 2 + 4);
+    }
 
-    // Month dots
+    // Vertical divider between task col and grid
+    ctx.strokeStyle = '#d8e5e4';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(TASK_COL, y);
+    ctx.lineTo(TASK_COL, y + ROW_H);
+    ctx.stroke();
+
+    // Month cells
     MONTHS.forEach((mon, ci) => {
-      const cx = LEFT + ci * COL_W + COL_W / 2 - 1;
-      const cy = y + ROW_H / 2;
-      ctx.strokeStyle = '#d8e5e4';
+      const cx = GRID_LEFT + ci * COL_W;
+      const cy = y;
+
+      // Cell border
+      ctx.strokeStyle = '#e8f0ef';
       ctx.lineWidth = 1;
-      ctx.strokeRect(LEFT + ci * COL_W, y, COL_W - 2, ROW_H);
+      ctx.strokeRect(cx, cy, COL_W - 1, ROW_H);
 
       if (placed.includes(mon)) {
+        // Filled circle
+        const dotX = cx + COL_W / 2;
+        const dotY = cy + ROW_H / 2;
         ctx.fillStyle = color;
         ctx.beginPath();
-        ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+        ctx.arc(dotX, dotY, 12, 0, Math.PI * 2);
         ctx.fill();
-        ctx.fillStyle = '#fff';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.fillText('✓', cx - 5, cy + 4);
+        // Checkmark
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 13px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('✓', dotX, dotY + 5);
+        ctx.textAlign = 'left';
       }
     });
+
+    // Row bottom divider
+    ctx.strokeStyle = '#e8f0ef';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, y + ROW_H);
+    ctx.lineTo(W, y + ROW_H);
+    ctx.stroke();
   });
 
-  // Footer
+  // ── Footer ──
+  const footerY = TOP + m.tasks.length * ROW_H + 20;
+  ctx.fillStyle = '#0a4d4a';
+  ctx.fillRect(0, footerY - 6, W, 1);
   ctx.fillStyle = '#5a6e6c';
   ctx.font = '11px sans-serif';
-  ctx.fillText('Keep this schedule on your fridge or save it to your phone. AMERIND — Tribes Protecting Tribes.', 30, H - 18);
+  ctx.fillText('AMERIND Risk Control Program  ·  Tribes Protecting Tribes  ·  Post this on your fridge or save to your phone.', 14, footerY + 14);
 
-  // Download
-  const a = document.createElement('a');
-  a.href = c.toDataURL('image/png');
-  a.download = `HomeReady-Maintenance-${name.replace(/\s+/g,'-')}.png`;
-  a.click();
+  // ── Download as PDF via printable window ──
+  const img = c.toDataURL('image/png');
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<title>Home Ready Maintenance Schedule</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#fff; }
+  img { width:100%; display:block; }
+  @media print {
+    body { margin:0; }
+    img { width:100%; page-break-inside:avoid; }
+  }
+</style>
+</head>
+<body>
+<img src="${img}" />
+<script>
+  window.onload = function() {
+    window.print();
+  };
+</script>
+</body>
+</html>`);
+  win.document.close();
 }
 
 
