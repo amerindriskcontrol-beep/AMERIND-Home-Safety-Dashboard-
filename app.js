@@ -445,87 +445,319 @@ function renderHotOrNot(m) {
   render();
 }
 
-// ── Maintenance Calendar ──
+// ── Maintenance Schedule Builder ──
 function renderCalendar(m) {
   const wrap = $('#tab-content');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const CAT_COLORS = {
+    'Plumbing':     '#0a6b67',
+    'Safety':       '#c0392b',
+    'HVAC':         '#1a5e8a',
+    'Electrical':   '#7b5ea7',
+    'Exterior':     '#2e7d32',
+    'Fire Safety':  '#e65100',
+    'Appliances':   '#5d4037',
+    'Waterproofing':'#00838f',
+    'Energy':       '#f57f17',
+  };
+
+  // plan: { taskId: [month, ...] } — supports multi-month tasks
   const plan = {};
 
-  wrap.innerHTML = `
-    <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">Drag tasks to the right months.</p>
-    <div style="display:flex;flex-direction:column;gap:16px">
-      <div>
-        <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Tasks</div>
-        <div class="drag-area" id="cal-tasks">
-          ${m.tasks.map(t => `
-            <div class="draggable" draggable="true" data-id="${t.id}">${t.label}</div>
-          `).join('')}
+  function getColor(cat) { return CAT_COLORS[cat] || '#0a4d4a'; }
+
+  function rerender() {
+    const unscheduled = m.tasks.filter(t => !plan[t.id] || plan[t.id].length === 0);
+    const scheduled = m.tasks.filter(t => plan[t.id] && plan[t.id].length > 0);
+
+    wrap.innerHTML = `
+      <p style="color:var(--muted);font-size:.85rem;margin-bottom:16px">
+        Tap a task, then tap the month(s) to schedule it. All tasks must be placed to complete.
+      </p>
+
+      <!-- Task pool -->
+      <div id="task-pool-wrap" style="margin-bottom:20px">
+        <div style="font-family:var(--font-display);font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">
+          Tasks to Schedule <span id="pool-count" style="background:var(--primary);color:#fff;border-radius:999px;padding:1px 8px;font-size:.7rem">${unscheduled.length}</span>
+        </div>
+        <div id="task-pool" style="display:flex;flex-wrap:wrap;gap:8px;min-height:36px">
+          ${unscheduled.length === 0
+            ? `<span style="color:var(--good);font-size:.88rem;font-weight:600">✓ All tasks scheduled!</span>`
+            : unscheduled.map(t => `
+              <button class="task-chip" data-id="${t.id}"
+                style="background:#fff;border:2px solid ${getColor(t.category)};color:${getColor(t.category)};
+                  padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:600;cursor:pointer;
+                  font-family:var(--font-display);transition:all .15s;white-space:nowrap"
+                title="${t.freq} — suggested: ${t.months.slice(0,3).join(', ')}${t.months.length > 3 ? '…' : ''}">
+                ${t.label}
+              </button>`).join('')
+          }
         </div>
       </div>
-      <div>
-        <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Schedule</div>
-        <div class="month-grid">
-          ${months.map(mon => `
-            <div class="month-zone" data-month="${mon}">
-              <div class="month-name">${mon}</div>
-              <div class="month-tasks" id="mt-${mon}"></div>
+
+      <!-- Selection hint -->
+      <div id="selection-hint" style="display:none;padding:10px 14px;background:var(--accent-light);border-left:4px solid var(--accent);border-radius:var(--radius-sm);font-size:.85rem;margin-bottom:12px">
+        <strong id="hint-label"></strong> — tap the month(s) below to schedule it.
+        <button id="cancel-select" style="margin-left:10px;background:none;border:none;cursor:pointer;color:var(--muted);font-size:.8rem">✕ cancel</button>
+      </div>
+
+      <!-- Calendar grid -->
+      <div style="font-family:var(--font-display);font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Schedule</div>
+      <div class="month-grid" id="month-grid">
+        ${MONTHS.map(mon => {
+          const tasksThisMonth = m.tasks.filter(t => plan[t.id]?.includes(mon));
+          return `<div class="month-zone" data-month="${mon}" id="mz-${mon}">
+            <div class="month-name">${mon}</div>
+            <div class="month-tasks" id="mt-${mon}">
+              ${tasksThisMonth.map(t => `
+                <div class="scheduled-chip" data-tid="${t.id}" data-mon="${mon}"
+                  style="background:${getColor(t.category)}18;color:${getColor(t.category)};
+                    font-size:.65rem;font-weight:700;padding:2px 5px;border-radius:4px;
+                    margin-top:3px;cursor:pointer;display:flex;align-items:center;gap:3px;line-height:1.2"
+                  title="Tap to remove">
+                  ${t.label.split(' ').slice(0,3).join(' ')} ✕
+                </div>`).join('')}
             </div>
-          `).join('')}
-        </div>
+          </div>`;
+        }).join('')}
       </div>
-    </div>
-    <div style="margin-top:16px;display:flex;gap:10px">
-      <button class="btn btn-primary" id="checkPlan">Check Plan</button>
-      <button class="btn btn-ghost" id="clearPlan">Clear</button>
-    </div>
-    <div id="plan-result" style="margin-top:10px"></div>
-  `;
 
-  $$('#cal-tasks .draggable').forEach(el => {
-    el.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', el.dataset.id); });
-  });
-  $$('.month-zone').forEach(zone => {
-    zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', (e) => {
-      e.preventDefault();
-      zone.classList.remove('drag-over');
-      const id = e.dataTransfer.getData('text/plain');
-      if (!id) return;
-      const mon = zone.dataset.month;
-      plan[id] = plan[id] || [];
-      if (!plan[id].includes(mon)) plan[id].push(mon);
-      const taskEl = m.tasks.find(t => t.id === id);
-      const mt = $(`#mt-${mon}`);
-      const abbr = taskEl?.label.split(' ').slice(0, 2).join(' ') || id;
-      mt.textContent = (mt.textContent ? mt.textContent + ', ' : '') + abbr;
-      zone.classList.add('has-task');
-    });
-  });
+      <!-- Footer -->
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        ${unscheduled.length === 0
+          ? `<button class="btn btn-primary" id="finishPlan">Save & Download PDF 📄</button>`
+          : `<button class="btn btn-primary" id="finishPlan" disabled>Save & Download PDF 📄</button>`
+        }
+        <button class="btn btn-ghost" id="clearPlan">Clear All</button>
+        <span style="font-size:.8rem;color:var(--muted)">${scheduled.length}/${m.tasks.length} tasks placed</span>
+      </div>
+      <div id="plan-result" style="margin-top:10px"></div>
+    `;
 
-  $('#checkPlan').addEventListener('click', () => {
-    let ok = 0; const notes = [];
-    m.tasks.forEach(t => {
-      const when = plan[t.id] || [];
-      const rec = t.recommended;
-      const good = rec.includes('Every Month') ? when.length >= 4 : when.some(x => rec.includes(x));
-      if (good) ok++;
-      else notes.push(`Schedule "${t.label}" in: ${rec.join(', ')}`);
+    // Active selection state
+    let selectedTask = null;
+
+    // Chip click — select task
+    $$('.task-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        selectedTask = chip.dataset.id;
+        const task = m.tasks.find(t => t.id === selectedTask);
+        $('#selection-hint').style.display = 'block';
+        $('#hint-label').textContent = task.label;
+        $$('.task-chip').forEach(c => c.style.transform = 'scale(1)');
+        chip.style.transform = 'scale(1.05)';
+        chip.style.boxShadow = '0 0 0 3px var(--accent)';
+      });
     });
-    const pct = Math.round((ok / m.tasks.length) * 100);
-    const result = $('#plan-result');
-    if (pct >= 75) {
-      result.innerHTML = `<div class="explain-box">✅ Good plan (${pct}%)! You've covered the key tasks.</div>`;
+
+    $('#cancel-select')?.addEventListener('click', () => {
+      selectedTask = null;
+      $('#selection-hint').style.display = 'none';
+      $$('.task-chip').forEach(c => { c.style.transform = ''; c.style.boxShadow = ''; });
+    });
+
+    // Month click — assign selected task
+    $$('.month-zone').forEach(zone => {
+      zone.addEventListener('click', () => {
+        if (!selectedTask) return;
+        const mon = zone.dataset.month;
+        const task = m.tasks.find(t => t.id === selectedTask);
+
+        plan[selectedTask] = plan[selectedTask] || [];
+        if (plan[selectedTask].includes(mon)) {
+          // Already placed this month — ignore
+          toast(`Already in ${mon}`);
+          return;
+        }
+
+        // For monthly tasks allow all 12; others cap at reasonable repeats
+        plan[selectedTask].push(mon);
+
+        // If freq is not monthly and task is now placed, deselect
+        if (task.freq !== 'Monthly') {
+          selectedTask = null;
+          $('#selection-hint').style.display = 'none';
+        } else {
+          // Monthly — let them keep tapping months
+          $('#hint-label').textContent = `${task.label} (${plan[task.id].length} months selected)`;
+        }
+
+        rerender();
+        // Re-select same task if monthly
+        if (task.freq === 'Monthly' && plan[task.id] && plan[task.id].length < 12) {
+          selectedTask = task.id;
+          const hint = $('#selection-hint');
+          if (hint) {
+            hint.style.display = 'block';
+            const hl = $('#hint-label');
+            if (hl) hl.textContent = `${task.label} (${plan[task.id].length} months selected — keep tapping or Done)`;
+          }
+        }
+      });
+
+      // Drag support (desktop)
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('drag-over'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        const id = e.dataTransfer.getData('text/plain');
+        if (!id) return;
+        plan[id] = plan[id] || [];
+        if (!plan[id].includes(zone.dataset.month)) plan[id].push(zone.dataset.month);
+        const task = m.tasks.find(t => t.id === id);
+        if (task?.freq !== 'Monthly') selectedTask = null;
+        rerender();
+      });
+    });
+
+    // Drag start on chips
+    $$('.task-chip').forEach(chip => {
+      chip.setAttribute('draggable', 'true');
+      chip.addEventListener('dragstart', (e) => e.dataTransfer.setData('text/plain', chip.dataset.id));
+    });
+
+    // Remove placed chip on tap
+    $$('.scheduled-chip').forEach(chip => {
+      chip.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const tid = chip.dataset.tid;
+        const mon = chip.dataset.mon;
+        if (plan[tid]) plan[tid] = plan[tid].filter(x => x !== mon);
+        rerender();
+      });
+    });
+
+    // Clear
+    $('#clearPlan')?.addEventListener('click', () => {
+      m.tasks.forEach(t => delete plan[t.id]);
+      rerender();
+    });
+
+    // Finish / PDF
+    $('#finishPlan')?.addEventListener('click', () => {
+      if (Object.keys(plan).length < m.tasks.length) return;
       state.progress[m.id] = state.progress[m.id] || {};
-      state.progress[m.id].doDone = true; save();
+      state.progress[m.id].doDone = true;
+      save();
       checkBadge(m.id);
-      autoAdvance(m.id, 'do');
-    } else {
-      result.innerHTML = `<div class="explain-box" style="border-color:var(--bad)">${pct}% — ${notes.join(' • ')}</div>`;
-    }
-  });
-  $('#clearPlan').addEventListener('click', () => { Object.keys(plan).forEach(k => delete plan[k]); renderCalendar(m); });
+      downloadMaintenancePDF(m, plan);
+      toast('📄 Schedule downloaded!');
+      setTimeout(() => autoAdvance(m.id, 'do'), 1200);
+    });
+  }
+
+  rerender();
 }
+
+// ── Maintenance PDF ──
+function downloadMaintenancePDF(m, plan) {
+  const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const CAT_COLORS = {
+    'Plumbing':'#0a6b67','Safety':'#c0392b','HVAC':'#1a5e8a','Electrical':'#7b5ea7',
+    'Exterior':'#2e7d32','Fire Safety':'#e65100','Appliances':'#5d4037',
+    'Waterproofing':'#00838f','Energy':'#f57f17',
+  };
+  const name = state.player.name || 'Resident';
+  const date = new Date().toLocaleDateString();
+
+  const c = document.createElement('canvas');
+  const W = 1100, H = 850;
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+
+  // Background
+  ctx.fillStyle = '#f8fafa';
+  ctx.fillRect(0, 0, W, H);
+
+  // Header band
+  ctx.fillStyle = '#0a4d4a';
+  ctx.fillRect(0, 0, W, 70);
+  ctx.fillStyle = '#f0a500';
+  ctx.fillRect(0, 70, W, 5);
+
+  // Header text
+  ctx.fillStyle = '#fff';
+  ctx.font = 'bold 26px sans-serif';
+  ctx.fillText('Home Ready — Annual Maintenance Schedule', 30, 44);
+  ctx.font = '14px sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,.75)';
+  ctx.fillText(`${name}  •  Generated ${date}  •  AMERIND Risk Control`, 30, 62);
+
+  // Month column headers
+  const LEFT = 200, COL_W = 80, ROW_H = 36, TOP = 110;
+  ctx.font = 'bold 12px sans-serif';
+  ctx.fillStyle = '#0a4d4a';
+  MONTHS.forEach((mon, i) => {
+    ctx.fillStyle = '#e2f0ef';
+    ctx.fillRect(LEFT + i * COL_W, TOP - 24, COL_W - 2, 22);
+    ctx.fillStyle = '#0a4d4a';
+    ctx.fillText(mon, LEFT + i * COL_W + 22, TOP - 8);
+  });
+
+  // Grid lines
+  ctx.strokeStyle = '#d8e5e4';
+  ctx.lineWidth = 1;
+
+  // Rows
+  m.tasks.forEach((task, ri) => {
+    const y = TOP + ri * ROW_H;
+    const placed = plan[task.id] || [];
+    const color = CAT_COLORS[task.category] || '#0a4d4a';
+
+    // Row bg alternating
+    ctx.fillStyle = ri % 2 === 0 ? '#fff' : '#f5f9f8';
+    ctx.fillRect(0, y, W, ROW_H);
+
+    // Category dot + task label
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.arc(14, y + ROW_H / 2, 5, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.fillStyle = '#0d1a19';
+    ctx.font = '12px sans-serif';
+    ctx.fillText(task.label.length > 28 ? task.label.slice(0, 27) + '…' : task.label, 26, y + ROW_H / 2 + 4);
+
+    ctx.fillStyle = color + '22';
+    const catW = 70;
+    ctx.fillRect(LEFT - catW - 4, y + 4, catW, ROW_H - 8);
+    ctx.fillStyle = color;
+    ctx.font = 'bold 9px sans-serif';
+    ctx.fillText(task.category.toUpperCase().slice(0,9), LEFT - catW, y + ROW_H / 2 + 3);
+
+    // Month dots
+    MONTHS.forEach((mon, ci) => {
+      const cx = LEFT + ci * COL_W + COL_W / 2 - 1;
+      const cy = y + ROW_H / 2;
+      ctx.strokeStyle = '#d8e5e4';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(LEFT + ci * COL_W, y, COL_W - 2, ROW_H);
+
+      if (placed.includes(mon)) {
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 10px sans-serif';
+        ctx.fillText('✓', cx - 5, cy + 4);
+      }
+    });
+  });
+
+  // Footer
+  ctx.fillStyle = '#5a6e6c';
+  ctx.font = '11px sans-serif';
+  ctx.fillText('Keep this schedule on your fridge or save it to your phone. AMERIND — Tribes Protecting Tribes.', 30, H - 18);
+
+  // Download
+  const a = document.createElement('a');
+  a.href = c.toDataURL('image/png');
+  a.download = `HomeReady-Maintenance-${name.replace(/\s+/g,'-')}.png`;
+  a.click();
+}
+
 
 // ── Quiz ──
 function renderQuiz(m) {

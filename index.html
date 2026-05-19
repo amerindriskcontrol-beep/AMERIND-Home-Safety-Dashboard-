@@ -373,15 +373,17 @@
     .month-zone {
       border: 2px dashed var(--border);
       border-radius: var(--radius-sm);
-      padding: 8px;
-      min-height: 52px;
+      padding: 8px 6px;
+      min-height: 64px;
       transition: all .15s;
-      text-align: center;
+      cursor: pointer;
     }
-    .month-zone.drag-over { border-color: var(--primary); background: var(--primary-light); }
-    .month-zone.has-task { border-color: var(--accent); border-style: solid; background: var(--accent-light); }
-    .month-name { font-family: var(--font-display); font-size: .78rem; font-weight: 700; color: var(--muted); }
-    .month-tasks { font-size: .7rem; color: var(--fg); margin-top: 3px; }
+    .month-zone:hover { border-color: var(--primary); background: var(--primary-light); }
+    .month-zone.drag-over { border-color: var(--accent); background: var(--accent-light); border-style: solid; }
+    .month-name { font-family: var(--font-display); font-size: .75rem; font-weight: 700; color: var(--muted); text-align:center; }
+    .month-tasks { font-size: .65rem; margin-top: 4px; display:flex; flex-direction:column; gap:2px; }
+    .scheduled-chip:hover { opacity: .75; }
+    .task-chip:hover { filter: brightness(.93); }
 
     /* ── QUIZ RESULT ── */
     .result-block {
