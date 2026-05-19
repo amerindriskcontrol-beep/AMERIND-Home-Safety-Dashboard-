@@ -296,37 +296,17 @@
       "id": "maintenance",
       "title": "Maintenance Basics",
       "cards": [
-        "Change HVAC filters every 1\u20133 months \u2014 monthly if you have pets or allergies.",
-        "Check under sinks and around toilets for leaks every month. Catch it early.",
-        "Before the first freeze, shut off and drain outdoor hose bibs to prevent burst pipes.",
-        "Vacuum refrigerator coils twice a year \u2014 dirty coils cost you money and shorten fridge life.",
-        "Test smoke and CO detectors monthly; replace batteries once a year.",
-        "Clean gutters every spring and fall to prevent water damage to your foundation.",
-        "Flush your water heater annually to remove sediment and extend its life.",
-        "Inspect caulking around tubs, showers, and windows \u2014 reseal any cracks before water gets in."
+        "Test smoke and CO detectors monthly \u2014 press the button until it beeps.",
+        "Check your HVAC filter monthly. Replace it every 60\u201390 days, or sooner if it looks gray or clogged. A clean filter protects your air quality and your system.",
+        "Check under sinks and around toilets monthly for drips or moisture. A slow leak caught early prevents mold and costly damage.",
+        "Clean your dryer lint trap after every load. Once a year, check that the vent duct behind the dryer is clear \u2014 a clogged duct is a fire hazard.",
+        "Vacuum the coils behind or under your refrigerator twice a year to keep it running efficiently and extend its life.",
+        "Keep vents and air returns unblocked by furniture, rugs, or stored items.",
+        "Replace smoke and CO detector batteries once a year \u2014 changing them when the clocks change is an easy way to remember.",
+        "Inspect caulking around your tub and shower annually. Reseal any cracks to keep water from getting into walls."
       ],
       "do": "calendar",
       "tasks": [
-        {
-          "id": "under-sink",
-          "label": "Check under-sink & toilet areas for leaks",
-          "freq": "Monthly",
-          "months": [
-            "Jan",
-            "Feb",
-            "Mar",
-            "Apr",
-            "May",
-            "Jun",
-            "Jul",
-            "Aug",
-            "Sep",
-            "Oct",
-            "Nov",
-            "Dec"
-          ],
-          "category": "Plumbing"
-        },
         {
           "id": "smoke-test",
           "label": "Test smoke & CO detectors",
@@ -348,14 +328,34 @@
           "category": "Safety"
         },
         {
-          "id": "hvac-filter",
-          "label": "Change HVAC filter",
-          "freq": "Quarterly",
+          "id": "under-sink",
+          "label": "Check under-sink for leaks",
+          "freq": "Monthly",
           "months": [
             "Jan",
+            "Feb",
+            "Mar",
             "Apr",
+            "May",
+            "Jun",
             "Jul",
-            "Oct"
+            "Aug",
+            "Sep",
+            "Oct",
+            "Nov",
+            "Dec"
+          ],
+          "category": "Plumbing"
+        },
+        {
+          "id": "hvac-filter",
+          "label": "Check filter monthly \u2014 replace every 60\u201390 days",
+          "freq": "Every 60\u201390 days (Recommended)",
+          "months": [
+            "Jan",
+            "Mar",
+            "Jun",
+            "Sep"
           ],
           "category": "HVAC"
         },
@@ -372,119 +372,34 @@
           "category": "Electrical"
         },
         {
-          "id": "gutters-spring",
-          "label": "Clean gutters & downspouts",
-          "freq": "Spring",
-          "months": [
-            "Mar",
-            "Apr",
-            "May"
-          ],
-          "category": "Exterior"
-        },
-        {
-          "id": "hose-bib-on",
-          "label": "Reconnect outdoor hoses & check irrigation",
-          "freq": "Spring",
-          "months": [
-            "Mar",
-            "Apr",
-            "May"
-          ],
-          "category": "Plumbing"
-        },
-        {
-          "id": "ac-service",
-          "label": "Service A/C before cooling season",
-          "freq": "Spring",
-          "months": [
-            "Mar",
-            "Apr",
-            "May"
-          ],
-          "category": "HVAC"
-        },
-        {
-          "id": "caulk-check",
-          "label": "Inspect & reseal caulking (tub, shower, windows)",
-          "freq": "Spring",
-          "months": [
-            "Apr",
-            "May"
-          ],
-          "category": "Waterproofing"
-        },
-        {
           "id": "dryer-vent",
-          "label": "Clean dryer vent duct",
-          "freq": "Summer",
+          "label": "Clean dryer lint trap & check vent",
+          "freq": "Every Load / Annual",
           "months": [
             "Jun",
-            "Jul",
-            "Aug"
+            "Jul"
           ],
           "category": "Fire Safety"
         },
         {
           "id": "fridge-coils",
           "label": "Vacuum refrigerator coils",
-          "freq": "Summer",
+          "freq": "Twice a year",
           "months": [
-            "Jun",
-            "Jul"
+            "Mar",
+            "Sep"
           ],
           "category": "Appliances"
         },
         {
-          "id": "gutters-fall",
-          "label": "Clean gutters after leaves fall",
-          "freq": "Fall",
-          "months": [
-            "Sep",
-            "Oct",
-            "Nov"
-          ],
-          "category": "Exterior"
-        },
-        {
-          "id": "hose-bib-off",
-          "label": "Shut off & drain outdoor hose bibs",
-          "freq": "Fall",
-          "months": [
-            "Oct",
-            "Nov"
-          ],
-          "category": "Plumbing"
-        },
-        {
-          "id": "furnace-service",
-          "label": "Service furnace before heating season",
-          "freq": "Fall",
-          "months": [
-            "Sep",
-            "Oct"
-          ],
-          "category": "HVAC"
-        },
-        {
-          "id": "weatherstrip",
-          "label": "Inspect & replace weatherstripping on doors/windows",
-          "freq": "Fall",
-          "months": [
-            "Sep",
-            "Oct"
-          ],
-          "category": "Energy"
-        },
-        {
-          "id": "water-heater",
-          "label": "Flush water heater to remove sediment",
+          "id": "caulk-check",
+          "label": "Inspect caulking around tub & shower",
           "freq": "Annual",
           "months": [
-            "Jan",
-            "Feb"
+            "Apr",
+            "May"
           ],
-          "category": "Plumbing"
+          "category": "Waterproofing"
         },
         {
           "id": "smoke-battery",
@@ -495,6 +410,16 @@
             "Nov"
           ],
           "category": "Safety"
+        },
+        {
+          "id": "hose-bib",
+          "label": "Drain outdoor hose before first freeze",
+          "freq": "Fall",
+          "months": [
+            "Oct",
+            "Nov"
+          ],
+          "category": "Plumbing"
         }
       ],
       "quiz": [

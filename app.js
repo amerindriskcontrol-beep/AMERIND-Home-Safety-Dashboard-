@@ -472,7 +472,7 @@ function renderCalendar(m) {
 
     wrap.innerHTML = `
       <p style="color:var(--muted);font-size:.85rem;margin-bottom:16px">
-        Tap a task, then tap the month(s) to schedule it. All tasks must be placed to complete.
+        Build your personal home maintenance schedule. Tap a task, then tap the month(s) to schedule it. Tap a placed task to remove it.
       </p>
 
       <!-- Task pool -->
@@ -486,10 +486,12 @@ function renderCalendar(m) {
             : unscheduled.map(t => `
               <button class="task-chip" data-id="${t.id}"
                 style="background:#fff;border:2px solid ${getColor(t.category)};color:${getColor(t.category)};
-                  padding:6px 12px;border-radius:999px;font-size:.8rem;font-weight:600;cursor:pointer;
-                  font-family:var(--font-display);transition:all .15s;white-space:nowrap"
-                title="${t.freq} — suggested: ${t.months.slice(0,3).join(', ')}${t.months.length > 3 ? '…' : ''}">
-                ${t.label}
+                  padding:6px 12px 6px 12px;border-radius:999px;font-size:.8rem;font-weight:600;cursor:pointer;
+                  font-family:var(--font-display);transition:all .15s;white-space:nowrap;
+                  display:inline-flex;flex-direction:column;align-items:flex-start;border-radius:10px"
+                title="${t.freq}">
+                <span>${t.label}</span>
+                ${t.freq.includes('Recommended') ? `<span style="font-size:.68rem;font-weight:700;opacity:.7;letter-spacing:.3px;margin-top:1px">★ RECOMMENDED: ${t.freq.replace(' (Recommended)','')}</span>` : ''}
               </button>`).join('')
           }
         </div>
