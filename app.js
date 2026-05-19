@@ -114,9 +114,8 @@ function start() {
 
   $('#app').innerHTML = `
     <div class="home-header">
-      <div class="home-header-eyebrow">Tribes Protecting Tribes</div>
-      <h2>${name ? `Welcome, ${name}.` : 'Keep Indian money in Indian Country.'}</h2>
-      <p>A safer home protects your family and strengthens your community. Complete each module to earn your Home Ready certificate.</p>
+      <h2>${name ? `Welcome, ${name}.` : 'Home Ready'}</h2>
+      <p>Complete each module to earn your Home Ready certificate.</p>
       <div class="overall-progress">
         <div class="progress-bar"><div class="fill" style="width:${overallPct}%"></div></div>
         <span>${state.badges.length}/4 badges</span>
@@ -156,7 +155,7 @@ function start() {
       <button class="btn btn-accent" id="downloadCert">Download Certificate</button>
     </div>` : ''}
 
-    <div class="community-tip"><strong>Be here for as long as Tribes need us.</strong> ${randPick(state.data.voice.community_tips)}</div>
+    <div class="community-tip">${randPick(state.data.voice.community_tips)}</div>
   `;
 
   $('#saveName')?.addEventListener('click', () => {
@@ -318,7 +317,7 @@ function renderDragDrop(m) {
   const placements = {};
   wrap.innerHTML = `
     <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px">Drag each item to its correct zone.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+    <div id="drag-layout" style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
       <div>
         <div style="font-family:var(--font-display);font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px">Items</div>
         <div class="drag-area" id="drag-items">
