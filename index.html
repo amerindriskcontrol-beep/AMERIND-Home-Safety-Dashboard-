@@ -1,0 +1,394 @@
+{
+  "voice": {
+    "tagline": "Tribes Protecting Tribes.",
+    "sub": "Protect our people. Strengthen our communities.",
+    "coach_lines": [
+      "Good catch. That fix prevents costly loss.",
+      "One checklist at a time\u2014we strengthen our homes.",
+      "Simple steps. Real safety."
+    ],
+    "community_tips": [
+      "After you test your alarms, ask if an elder nearby needs a hand.",
+      "Share your checklist with a neighbor who just moved in.",
+      "Keep walkways clear and well-lit; check on folks who use mobility aids."
+    ]
+  },
+  "modules": [
+    {
+      "id": "fire",
+      "title": "Fire Safety",
+      "cards": [
+        "Test smoke alarms once a month. Replace the unit every 10 years.",
+        "Keep space heaters 3 feet from anything that can burn.",
+        "Stay in the kitchen when frying or broiling. Keep a lid nearby for grease fires.",
+        "Clean the dryer lint trap every load; clean the vent duct regularly.",
+        "Plan two exits from each room and pick a meeting spot outside."
+      ],
+      "do": "findfix",
+      "hazards": [
+        {
+          "id": "pan-grease",
+          "text": "Grease flame on stove",
+          "correct": "Slide a lid on and turn off heat. Never use water.",
+          "state": false
+        },
+        {
+          "id": "lint-trap",
+          "text": "Clogged dryer lint trap",
+          "correct": "Clean the lint trap before each load.",
+          "state": false
+        },
+        {
+          "id": "heater-close",
+          "text": "Space heater near curtains",
+          "correct": "Move the heater 3 feet away from anything that burns.",
+          "state": false
+        },
+        {
+          "id": "no-plan",
+          "text": "No family meeting spot",
+          "correct": "Pick a spot outside and practice the plan.",
+          "state": false
+        }
+      ],
+      "quiz": [
+        {
+          "q": "How often should you test smoke alarms?",
+          "choices": [
+            "Yearly",
+            "Monthly",
+            "Only when it beeps"
+          ],
+          "a": 1,
+          "explain": "Test monthly; replace the unit every 10 years."
+        },
+        {
+          "q": "Grease fire on the stove\u2014what do you do?",
+          "choices": [
+            "Use water",
+            "Slide a lid on and turn off heat",
+            "Move the pan"
+          ],
+          "a": 1,
+          "explain": "Slide on a lid and turn off the heat. Never use water."
+        },
+        {
+          "q": "Space heater rule of thumb:",
+          "choices": [
+            "1 foot",
+            "3 feet",
+            "Just keep it away"
+          ],
+          "a": 1,
+          "explain": "Keep heaters 3 feet from anything that can burn."
+        },
+        {
+          "q": "Dryer safety includes:",
+          "choices": [
+            "Clean lint trap every load",
+            "Close vent permanently",
+            "Dry thick fabrics only"
+          ],
+          "a": 0,
+          "explain": "Clean the lint trap every load; clean vent duct regularly."
+        },
+        {
+          "q": "An escape plan needs:",
+          "choices": [
+            "One exit",
+            "Two exits and a meeting spot",
+            "Just a flashlight"
+          ],
+          "a": 1,
+          "explain": "Plan two exits per room and a meeting spot outside."
+        }
+      ]
+    },
+    {
+      "id": "electrical",
+      "title": "Electrical Safety",
+      "cards": [
+        "Use GFCI protection in kitchens, bathrooms, garages, and outdoors. Test monthly.",
+        "Avoid overloaded power strips and cords under rugs or doors.",
+        "Plug space heaters directly into wall outlets\u2014no extension cords.",
+        "Know how to reset a tripped breaker safely."
+      ],
+      "do": "dragdrop",
+      "drag_items": [
+        {
+          "id": "space-heater",
+          "label": "Space Heater",
+          "target": "wall-outlet",
+          "correct_tip": "Heater goes to a wall outlet. No extension cords."
+        },
+        {
+          "id": "power-strip",
+          "label": "Overloaded Power Strip",
+          "target": "remove-item",
+          "correct_tip": "Unplug extras\u2014avoid overloads."
+        },
+        {
+          "id": "cord-under-rug",
+          "label": "Cord Under Rug",
+          "target": "remove-item",
+          "correct_tip": "Move the cord. Never run cords under rugs."
+        },
+        {
+          "id": "gfci-tester",
+          "label": "GFCI Tester",
+          "target": "gfci",
+          "correct_tip": "Test GFCI monthly."
+        }
+      ],
+      "dropzones": [
+        {
+          "id": "wall-outlet",
+          "label": "Wall Outlet"
+        },
+        {
+          "id": "gfci",
+          "label": "GFCI Outlet"
+        },
+        {
+          "id": "remove-item",
+          "label": "Remove Unsafe Item"
+        }
+      ],
+      "quiz": [
+        {
+          "q": "Where should GFCI outlets be?",
+          "choices": [
+            "Bedrooms only",
+            "Kitchens, baths, garages, outdoors",
+            "Anywhere"
+          ],
+          "a": 1,
+          "explain": "Use GFCI in wet/utility areas; test monthly."
+        },
+        {
+          "q": "Space heater should plug into:",
+          "choices": [
+            "Power strip",
+            "Wall outlet",
+            "Any extension cord"
+          ],
+          "a": 1,
+          "explain": "Use a wall outlet only."
+        },
+        {
+          "q": "Cords under rugs are:",
+          "choices": [
+            "Fine",
+            "Unsafe",
+            "Best practice"
+          ],
+          "a": 1,
+          "explain": "They can overheat\u2014keep cords visible and clear."
+        },
+        {
+          "q": "An overloaded power strip can:",
+          "choices": [
+            "Help safety",
+            "Trip GFCI only",
+            "Cause overheating and fire"
+          ],
+          "a": 2,
+          "explain": "Overloads overheat. Reduce plugs and spread loads."
+        },
+        {
+          "q": "Testing a GFCI:",
+          "choices": [
+            "Never",
+            "Monthly",
+            "Only after rain"
+          ],
+          "a": 1,
+          "explain": "Press test monthly to be sure it trips and resets."
+        }
+      ]
+    },
+    {
+      "id": "life",
+      "title": "Life Safety",
+      "cards": [
+        "Install CO detectors outside sleeping areas and on each level; test monthly.",
+        "Set the water heater to 120\u00b0F (49\u00b0C).",
+        "Use anti-slip mats and grab bars where needed.",
+        "Store knives and cleaning chemicals safely, out of children\u2019s reach."
+      ],
+      "do": "hotornot",
+      "hot": [
+        {
+          "prompt": "Water heater set to 140\u00b0F",
+          "answer": "not",
+          "tip": "Set to 120\u00b0F (49\u00b0C) to reduce scald risk."
+        },
+        {
+          "prompt": "CO detector in hallway near bedrooms",
+          "answer": "hot",
+          "tip": "That\u2019s right\u2014test monthly."
+        },
+        {
+          "prompt": "Cleaner bottle under unlocked sink",
+          "answer": "not",
+          "tip": "Use child locks or store up high."
+        },
+        {
+          "prompt": "Anti-slip mat in shower",
+          "answer": "hot",
+          "tip": "Helps prevent falls."
+        }
+      ],
+      "quiz": [
+        {
+          "q": "CO detectors belong:",
+          "choices": [
+            "Garage only",
+            "Outside sleeping areas and each level",
+            "Kitchen only"
+          ],
+          "a": 1,
+          "explain": "Place near bedrooms and on each level; test monthly."
+        },
+        {
+          "q": "Safe water heater setting:",
+          "choices": [
+            "120\u00b0F",
+            "140\u00b0F",
+            "160\u00b0F"
+          ],
+          "a": 0,
+          "explain": "Set to 120\u00b0F (49\u00b0C)."
+        },
+        {
+          "q": "To reduce slips you could:",
+          "choices": [
+            "Use anti-slip mats",
+            "Use glossy tiles",
+            "Carry water"
+          ],
+          "a": 0,
+          "explain": "Anti-slip mats and grab bars help prevent falls."
+        },
+        {
+          "q": "Cleaning chemicals should be:",
+          "choices": [
+            "Within reach",
+            "Locked away or up high",
+            "Under pillow"
+          ],
+          "a": 1,
+          "explain": "Store safely away from children."
+        },
+        {
+          "q": "When to test CO detector:",
+          "choices": [
+            "Monthly",
+            "Yearly",
+            "Never"
+          ],
+          "a": 0,
+          "explain": "Test monthly."
+        }
+      ]
+    },
+    {
+      "id": "maintenance",
+      "title": "Maintenance Basics",
+      "cards": [
+        "Change HVAC filters quarterly (or monthly if dirty).",
+        "Check for leaks under sinks monthly.",
+        "Before freezes, shut off and drain outdoor hoses.",
+        "Vacuum fridge coils twice a year to improve efficiency."
+      ],
+      "do": "calendar",
+      "tasks": [
+        {
+          "id": "filter",
+          "label": "Change HVAC filter",
+          "recommended": [
+            "Jan",
+            "Apr",
+            "Jul",
+            "Oct"
+          ]
+        },
+        {
+          "id": "under-sink",
+          "label": "Check under-sink for leaks",
+          "recommended": [
+            "Every Month"
+          ]
+        },
+        {
+          "id": "hose-bib",
+          "label": "Shut off/drain outdoor hose",
+          "recommended": [
+            "Oct",
+            "Nov"
+          ]
+        },
+        {
+          "id": "fridge-coils",
+          "label": "Vacuum fridge coils",
+          "recommended": [
+            "Mar",
+            "Sep"
+          ]
+        }
+      ],
+      "quiz": [
+        {
+          "q": "How often to change HVAC filters?",
+          "choices": [
+            "Quarterly (or as needed)",
+            "Every 2 years",
+            "Only when broken"
+          ],
+          "a": 0,
+          "explain": "Quarterly is typical; monthly if dirty."
+        },
+        {
+          "q": "Outdoor hoses before freezing:",
+          "choices": [
+            "Leave on",
+            "Shut off and drain",
+            "Wrap in towels"
+          ],
+          "a": 1,
+          "explain": "Shut off and drain to prevent burst pipes."
+        },
+        {
+          "q": "Fridge coils:",
+          "choices": [
+            "Never clean",
+            "Clean twice a year",
+            "Every day"
+          ],
+          "a": 1,
+          "explain": "Vacuum coils about every 6 months."
+        },
+        {
+          "q": "Monthly habit:",
+          "choices": [
+            "Under-sink leak check",
+            "Paint the roof",
+            "Replace windows"
+          ],
+          "a": 0,
+          "explain": "Look for drips and moisture monthly."
+        },
+        {
+          "q": "Filters if very dirty:",
+          "choices": [
+            "Ignore them",
+            "Wait a year",
+            "Change sooner"
+          ],
+          "a": 2,
+          "explain": "Change sooner when dirty."
+        }
+      ]
+    }
+  ]
+}
